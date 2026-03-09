@@ -282,5 +282,37 @@ Example observation:
 
 GPU training is strongly recommended for practical use.
 
+To make the model / training simpler for CPU (tho there is nothing such as free lunch!): we can make the following possible changes to the config:
+```python
+config = {
+    "d_model": 512, # TRY: 128 ---- **NEW**
+    "n_layers": 6, # TRY: 2 ---- **NEW**
+    "batch_size": 32, # TRY: 16 (or even 8)
+    "distributed": False,
+    "num_epochs": 8, # TRY: 4
+    "accum_iter": 10,
+    "base_lr": 1.0,
+    "max_padding": 72, # TRY: 40
+    "warmup": 3000,
+    "file_prefix": "multi30k_model_",
+}
 ```
+
+and yes, there are two unseen variables which the `train_worker` had defined inside, there we make the change from:
+
+```python
+d_model = 512
+model = make_model(len(vocab_src), len(vocab_tgt), N=6)
 ```
+
+to:
+
+```python
+d_model = config["d_model"] if "d_model" in config else 512
+n_layers = config["n_layers"] if "n_layers" in config else 6
+model = make_model(len(vocab_src), len(vocab_tgt), N=n_layers)
+```
+
+<text style="color: red; font-weight: bold;">
+NOTE that the last 3 subsection on CPU efficiency is NOT implemented for distributed training (obviously) and is only for debugging / learning purposes. For distributed training, GPU is a must.
+</text>
