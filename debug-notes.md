@@ -186,7 +186,7 @@ def train_worker(
     ).to(device)
 
     train_dataloader, valid_dataloader = create_dataloaders(
-        gpu,
+        device,
         vocab_src,
         vocab_tgt,
         spacy_de,
